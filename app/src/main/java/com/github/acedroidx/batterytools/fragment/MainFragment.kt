@@ -12,11 +12,11 @@ import com.github.acedroidx.batterytools.SuDo
 import kotlinx.android.synthetic.main.main_fragment.*
 import android.R.id.edit
 import android.content.SharedPreferences
-import android.util.Log
 import android.widget.SeekBar
 import android.content.Intent
 import android.content.IntentFilter
 import com.github.acedroidx.batterytools.BatteryReceiver
+import com.github.acedroidx.batterytools.Log
 
 
 class MainFragment : Fragment() {
@@ -42,6 +42,10 @@ class MainFragment : Fragment() {
         // TODO: Use the ViewModel
         val settings = context?.getSharedPreferences("BatterySetting", 0)
         val editor = settings?.edit()
+        seekBar_maxAutoCharge.progress=settings!!.getInt("maxBattery",100)
+        seekBar_minAutoCharge.progress=settings!!.getInt("minBattery",100)
+        text_max.text=settings!!.getInt("maxBattery",100).toString()
+        text_min.text=settings!!.getInt("minBattery",100).toString()
         button_ResumeChanger.setOnClickListener { SuDo(context).execCmdSync(ResumeChanger) }
         button_DisableChanger.setOnClickListener { SuDo(context).execCmdSync(DisableChanger)}
         switch_autoCharge.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -67,8 +71,8 @@ class MainFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 // Another empty method
-                Log.d("wxxDebug","max:"+seekBar.progress.toString())
-                editor?.putInt("maxBattery", seekBar.progress)
+                Log.d("max:"+seekBar.progress.toString())
+                editor?.putInt("maxBattery", seekBar.progress)?.apply()
             }
         })
         seekBar_minAutoCharge.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
@@ -83,8 +87,8 @@ class MainFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 // Another empty method
-                Log.d("wxxDebug","min:"+seekBar.progress.toString())
-                editor?.putInt("minBattery", seekBar.progress)
+                Log.d("min:"+seekBar.progress.toString())
+                editor?.putInt("minBattery", seekBar.progress)?.apply()
             }
         })
     }

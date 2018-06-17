@@ -41,13 +41,13 @@ class BatteryService : IntentService("BatteryService") {
             Toast.makeText(applicationContext, "数据错误1", Toast.LENGTH_LONG).show()
         }
         getBatterySetting()
-        if(state!=1){
+        if (state != 1) {
             return
         }
         if (param1 >= maxBattery) {
-            SuDo(applicationContext).execCmdSync(MainFragment.DisableChanger)
+            changeBattery("disable")
         } else if (param1 <= minBattery) {
-            SuDo(applicationContext).execCmdSync(MainFragment.ResumeChanger)
+            changeBattery("resume")
         }
     }
 
@@ -59,6 +59,20 @@ class BatteryService : IntentService("BatteryService") {
         minBattery = settings.getInt("minBattery", 404)
         if (maxBattery > 100 || minBattery > 100 || state > 1) {
             Toast.makeText(applicationContext, "数据错误2", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun changeBattery(type: String) {
+        val bp = SuDo(applicationContext).execReturn("getprop BatteryTools.bp")
+        when (type) {
+            "disable" -> {
+                Log.d("disable")
+                if (bp != "1") SuDo(applicationContext).execCmdSync(MainFragment.DisableChanger)
+            }
+            "resume" -> {
+                Log.d("resume")
+                if (bp != "0") SuDo(applicationContext).execCmdSync(MainFragment.ResumeChanger)
+            }
         }
     }
 

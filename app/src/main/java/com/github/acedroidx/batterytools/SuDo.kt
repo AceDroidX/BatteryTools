@@ -1,15 +1,12 @@
 package com.github.acedroidx.batterytools
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
-
-import java.io.DataOutputStream
-import java.io.IOException
+import java.io.*
 
 /**
  * Created by AceDroidX on 2018/5/20 2:12.
- * 本文件引用https://github.com/helloklf/vtools/blob/master/app/src/main/java/com/omarea/shell/SuDo.java
+ * 本文件部分引用https://github.com/helloklf/vtools/blob/master/app/src/main/java/com/omarea/shell/SuDo.java
  */
 
 class SuDo(private val context: Context?) {
@@ -30,7 +27,7 @@ class SuDo(private val context: Context?) {
             out.writeBytes("exit\n")
             out.flush()
             p.waitFor()
-            Log.d("r", "" + p.exitValue())
+            Log.d("" + p.exitValue())
             return p.exitValue() == 0
         } catch (e: IOException) {
             noRoot()
@@ -56,5 +53,16 @@ class SuDo(private val context: Context?) {
 
         }
 
+    }
+
+    fun execReturn(cmd: String): String {
+        val mRuntime = Runtime.getRuntime()
+        val mProcess = mRuntime.exec(cmd)
+        val mReader = BufferedReader(mProcess.inputStream.bufferedReader())
+        mProcess.waitFor()
+        val result = mReader.readLine()
+        mReader.close()
+        Log.d("execRt:"+result)
+        return result
     }
 }
