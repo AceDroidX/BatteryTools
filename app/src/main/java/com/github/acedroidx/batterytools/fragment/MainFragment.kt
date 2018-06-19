@@ -24,8 +24,8 @@ class MainFragment : Fragment() {
 
     companion object {
         //引用https://github.com/helloklf/vtools/blob/master/app/src/main/java/com/omarea/shared/Consts.kt
-        public val DisableChanger = "if [ -f '/sys/class/power_supply/battery/battery_charging_enabled' ]; then echo 0 > /sys/class/power_supply/battery/battery_charging_enabled; else echo 1 > /sys/class/power_supply/battery/input_suspend; fi;setprop BatteryTools.bp 1;\n"
-        public val ResumeChanger = "if [ -f '/sys/class/power_supply/battery/battery_charging_enabled' ]; then echo 1 > /sys/class/power_supply/battery/battery_charging_enabled; else echo 0 > /sys/class/power_supply/battery/input_suspend; fi;setprop BatteryTools.bp 0;\n"
+        val DisableChanger = "if [ -f '/sys/class/power_supply/battery/battery_charging_enabled' ]; then echo 0 > /sys/class/power_supply/battery/battery_charging_enabled; else echo 1 > /sys/class/power_supply/battery/input_suspend; fi;setprop BatteryTools.bp 1;\n"
+        val ResumeChanger = "if [ -f '/sys/class/power_supply/battery/battery_charging_enabled' ]; then echo 1 > /sys/class/power_supply/battery/battery_charging_enabled; else echo 0 > /sys/class/power_supply/battery/input_suspend; fi;setprop BatteryTools.bp 0;\n"
         fun newInstance() = MainFragment()
     }
 
@@ -42,27 +42,31 @@ class MainFragment : Fragment() {
         // TODO: Use the ViewModel
         val settings = context?.getSharedPreferences("BatterySetting", 0)
         val editor = settings?.edit()
-        seekBar_maxAutoCharge.progress=settings!!.getInt("maxBattery",100)
-        seekBar_minAutoCharge.progress=settings!!.getInt("minBattery",100)
-        text_max.text=settings!!.getInt("maxBattery",100).toString()
-        text_min.text=settings!!.getInt("minBattery",100).toString()
+        //初始化控件
+        seekBar_maxAutoCharge.progress = settings!!.getInt("maxBattery", 100)
+        seekBar_minAutoCharge.progress = settings.getInt("minBattery", 100)
+        text_max.text = settings.getInt("maxBattery", 100).toString()
+        text_min.text = settings.getInt("minBattery", 100).toString()
+        val state = settings.getInt("state", 0)
+        switch_autoCharge.isChecked = state == 1
+        //ClickListener
         button_ResumeChanger.setOnClickListener { SuDo(context).execCmdSync(ResumeChanger) }
-        button_DisableChanger.setOnClickListener { SuDo(context).execCmdSync(DisableChanger)}
+        button_DisableChanger.setOnClickListener { SuDo(context).execCmdSync(DisableChanger) }
         switch_autoCharge.setOnCheckedChangeListener { buttonView, isChecked ->
-            if(isChecked){
+            if (isChecked) {
                 editor?.putInt("state", 1)?.apply()
                 val intentFilter = IntentFilter()
                 intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED)
                 context?.registerReceiver(batteryReceiver, intentFilter)
-            }else{
+            } else {
                 editor?.putInt("state", 0)?.apply()
                 context?.unregisterReceiver(batteryReceiver)
             }
         }
-        seekBar_maxAutoCharge.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+        seekBar_maxAutoCharge.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 // Something
-                text_max.text=progress.toString()
+                text_max.text = progress.toString()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -71,14 +75,14 @@ class MainFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 // Another empty method
-                Log.d("max:"+seekBar.progress.toString())
+                Log.d("max:" + seekBar.progress.toString())
                 editor?.putInt("maxBattery", seekBar.progress)?.apply()
             }
         })
-        seekBar_minAutoCharge.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+        seekBar_minAutoCharge.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 // Something
-                text_min.text=progress.toString()
+                text_min.text = progress.toString()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -87,7 +91,7 @@ class MainFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 // Another empty method
-                Log.d("min:"+seekBar.progress.toString())
+                Log.d("min:" + seekBar.progress.toString())
                 editor?.putInt("minBattery", seekBar.progress)?.apply()
             }
         })
