@@ -1,28 +1,35 @@
 package com.github.acedroidx.batterytools
 
-import android.app.IntentService
+import android.app.Service
 import android.content.Intent
 import android.content.Context
+import android.content.IntentFilter
 import android.widget.Toast
-import android.content.SharedPreferences
+import android.os.IBinder
 import com.github.acedroidx.batterytools.fragment.MainFragment
 
 
-private const val ACTION_START = "com.github.acedroidx.batterytools.action.START"
+private const val ACTION_REG = "com.github.acedroidx.batterytools.action.REG"
+private const val ACTION_UNREG = "com.github.acedroidx.batterytools.action.UNREG"
 private const val ACTION_CHANGE = "com.github.acedroidx.batterytools.action.CHANGE"
 
 private const val EXTRA_LEVEL = "com.github.acedroidx.batterytools.extra.LEVEL"
 private const val EXTRA_TOTAL = "com.github.acedroidx.batterytools.extra.TOTAL"
 
-class BatteryService : IntentService("BatteryService") {
+class BatteryService : Service() {
+
     private var state: Int = 2
     private var maxBattery: Int = 505
     private var minBattery: Int = 505
+    val batteryReceiver = BatteryReceiver()
 
-    override fun onHandleIntent(intent: Intent?) {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
-            ACTION_START -> {
-                handleActionStart()
+            ACTION_REG -> {
+                register()
+            }
+            ACTION_UNREG -> {
+                unregister()
             }
             ACTION_CHANGE -> {
                 val param1: Int = intent.getIntExtra(EXTRA_LEVEL, 404)
@@ -30,10 +37,7 @@ class BatteryService : IntentService("BatteryService") {
                 handleActionChange(param1, param2)
             }
         }
-    }
-
-    private fun handleActionStart() {
-
+        return Service.START_REDELIVER_INTENT
     }
 
     private fun handleActionChange(param1: Int, param2: Int) {
@@ -49,6 +53,21 @@ class BatteryService : IntentService("BatteryService") {
         } else if (param1 <= minBattery) {
             changeBattery("resume")
         }
+    }
+
+    private fun register(){
+        val settings = applicationContext.getSharedPreferences("BatterySetting", 0)
+        val editor = settings?.edit()
+        editor?.putInt("state", 1)?.apply()
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED)
+        applicationContext.registerReceiver(batteryReceiver, intentFilter)
+    }
+    private fun unregister(){
+        val settings = applicationContext.getSharedPreferences("BatterySetting", 0)
+        val editor = settings?.edit()
+        editor?.putInt("state", 0)?.apply()
+        applicationContext.unregisterReceiver(batteryReceiver)
     }
 
     private fun getBatterySetting() {
@@ -76,11 +95,23 @@ class BatteryService : IntentService("BatteryService") {
         }
     }
 
+    override fun onBind(intent: Intent?): IBinder {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     companion object {
         @JvmStatic
         fun startService(context: Context) {
             val intent = Intent(context, BatteryService::class.java).apply {
-                action = ACTION_START
+                action = ACTION_REG
+            }
+            context.startService(intent)
+        }
+
+        @JvmStatic
+        fun stopService(context: Context) {
+            val intent = Intent(context, BatteryService::class.java).apply {
+                action = ACTION_UNREG
             }
             context.startService(intent)
         }

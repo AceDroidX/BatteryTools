@@ -6,21 +6,12 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import com.github.acedroidx.batterytools.R
-import com.github.acedroidx.batterytools.SuDo
 import kotlinx.android.synthetic.main.main_fragment.*
-import android.R.id.edit
-import android.content.SharedPreferences
 import android.widget.SeekBar
-import android.content.Intent
-import android.content.IntentFilter
-import com.github.acedroidx.batterytools.BatteryReceiver
-import com.github.acedroidx.batterytools.Log
+import com.github.acedroidx.batterytools.*
 
 
 class MainFragment : Fragment() {
-    val batteryReceiver = BatteryReceiver()
 
     companion object {
         //引用https://github.com/helloklf/vtools/blob/master/app/src/main/java/com/omarea/shared/Consts.kt
@@ -54,13 +45,9 @@ class MainFragment : Fragment() {
         button_DisableChanger.setOnClickListener { SuDo(context).execCmdSync(DisableChanger) }
         switch_autoCharge.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                editor?.putInt("state", 1)?.apply()
-                val intentFilter = IntentFilter()
-                intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED)
-                context?.registerReceiver(batteryReceiver, intentFilter)
+                BatteryService.startService(context!!)
             } else {
-                editor?.putInt("state", 0)?.apply()
-                context?.unregisterReceiver(batteryReceiver)
+                BatteryService.stopService(context!!)
             }
         }
         seekBar_maxAutoCharge.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
