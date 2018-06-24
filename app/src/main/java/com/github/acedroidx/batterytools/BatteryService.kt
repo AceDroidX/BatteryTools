@@ -17,27 +17,36 @@ private const val EXTRA_LEVEL = "com.github.acedroidx.batterytools.extra.LEVEL"
 private const val EXTRA_TOTAL = "com.github.acedroidx.batterytools.extra.TOTAL"
 
 class BatteryService : Service() {
-
     private var state: Int = 2
     private var maxBattery: Int = 505
     private var minBattery: Int = 505
     val batteryReceiver = BatteryReceiver()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
-            ACTION_REG -> {
-                register()
-            }
-            ACTION_UNREG -> {
-                unregister()
-            }
-            ACTION_CHANGE -> {
-                val param1: Int = intent.getIntExtra(EXTRA_LEVEL, 404)
-                val param2: Int = intent.getIntExtra(EXTRA_TOTAL, 404)
-                handleActionChange(param1, param2)
+        Log.d("intent:" + intent.toString())
+        if(intent==null){
+            Log.d("intent:null")
+            register()
+        }else{
+            when (intent.action) {
+                ACTION_REG -> {
+                    register()
+                }
+                ACTION_UNREG -> {
+                    unregister()
+                }
+                ACTION_CHANGE -> {
+                    val param1: Int = intent.getIntExtra(EXTRA_LEVEL, 404)
+                    val param2: Int = intent.getIntExtra(EXTRA_TOTAL, 404)
+                    handleActionChange(param1, param2)
+                }
+                else -> {
+                    Log.d("intent:else")
+                    register()
+                }
             }
         }
-        return Service.START_REDELIVER_INTENT
+        return Service.START_STICKY
     }
 
     private fun handleActionChange(param1: Int, param2: Int) {
@@ -55,7 +64,7 @@ class BatteryService : Service() {
         }
     }
 
-    private fun register(){
+    private fun register() {
         val settings = applicationContext.getSharedPreferences("BatterySetting", 0)
         val editor = settings?.edit()
         editor?.putInt("state", 1)?.apply()
@@ -63,11 +72,20 @@ class BatteryService : Service() {
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED)
         applicationContext.registerReceiver(batteryReceiver, intentFilter)
     }
-    private fun unregister(){
-        val settings = applicationContext.getSharedPreferences("BatterySetting", 0)
-        val editor = settings?.edit()
-        editor?.putInt("state", 0)?.apply()
-        applicationContext.unregisterReceiver(batteryReceiver)
+
+    private fun unregister() {
+        try {
+            val settings = applicationContext.getSharedPreferences("BatterySetting", 0)
+            val editor = settings?.edit()
+            editor?.putInt("state", 0)?.apply()
+            applicationContext.unregisterReceiver(batteryReceiver)
+            stopSelf()
+        }catch (e:Throwable){
+            e.printStackTrace()
+            Log.e(e.localizedMessage)
+            Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_LONG).show()
+        }
+
     }
 
     private fun getBatterySetting() {
@@ -85,11 +103,9 @@ class BatteryService : Service() {
         val bp = SuDo(applicationContext).execReturn("getprop BatteryTools.bp")
         when (type) {
             "disable" -> {
-                Log.d("disable")
                 if (bp != "1") SuDo(applicationContext).execCmdSync(MainFragment.DisableChanger)
             }
             "resume" -> {
-                Log.d("resume")
                 if (bp != "0") SuDo(applicationContext).execCmdSync(MainFragment.ResumeChanger)
             }
         }
