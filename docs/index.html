@@ -30,14 +30,15 @@
 		if(t="r"){//readme
 		    self.location = 'https://github.com/AceDroidX/BatteryTools/blob/master/README.md';
 		}
-		if(t="g"){//github
+		else if(t="g"){//github
 		    self.location = 'https://github.com/AceDroidX/BatteryTools';
 		}
-		if(t="d"){//download
+		else if(t="d"){//download
 		    self.location = 'https://github.com/AceDroidX/BatteryTools/raw/master/app-release-1.1.apk';
 		}
-		self.location = 'https://github.com/AceDroidX/BatteryTools';
-
+		else {
+		    self.location = 'https://github.com/AceDroidX/BatteryTools';
+		}
         function getQueryVariable(variable) {
             var query = window.location.search.substring(1);
             var vars = query.split("&");
