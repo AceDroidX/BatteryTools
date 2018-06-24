@@ -14,7 +14,7 @@ class BatteryReceiver : BroadcastReceiver() {
             val level = intent.getIntExtra("level", 0)
             //取得系统总电量
             val total = intent.getIntExtra("scale", 100)
-            BatteryService.startActionChange(context,level,total)
+            BatteryService.startActionChange(context, level, total)
         }
     }
 }

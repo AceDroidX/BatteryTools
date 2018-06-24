@@ -12,7 +12,12 @@ class Log {
         fun d(str: String) {
             Log.d("wxxDebug", str)
         }
-        fun e(str:String){
+
+        fun d(str: Int) {
+            Log.d("wxxDebug", str.toString())
+        }
+
+        fun e(str: String) {
             Log.e("wxxDebug", str)
         }
     }

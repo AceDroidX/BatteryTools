@@ -34,12 +34,25 @@ class MainFragment : Fragment() {
         val settings = context?.getSharedPreferences("BatterySetting", 0)
         val editor = settings?.edit()
         //初始化控件
-        seekBar_maxAutoCharge.progress = settings!!.getInt("maxBattery", 100)
-        seekBar_minAutoCharge.progress = settings.getInt("minBattery", 100)
-        text_max.text = settings.getInt("maxBattery", 100).toString()
-        text_min.text = settings.getInt("minBattery", 100).toString()
-        val state = settings.getInt("state", 0)
-        switch_autoCharge.isChecked = state == 1
+        var max:Int = settings!!.getInt("maxBattery", 404)
+        var min:Int = settings.getInt("minBattery", 404)
+        Log.d(max)
+        Log.d(min)
+        if (max == 404) {
+            Log.d("max:404")
+            max = 80
+            editor?.putInt("maxBattery", 80)?.apply()
+        }
+        if (min == 404) {
+            Log.d("min:404")
+            min = 30
+            editor?.putInt("minBattery", 30)?.apply()
+        }
+        seekBar_maxAutoCharge.progress = max
+        seekBar_minAutoCharge.progress = min
+        text_max.text = settings.getInt("maxBattery", 80).toString()
+        text_min.text = settings.getInt("minBattery", 30).toString()
+        switch_autoCharge.isChecked = BatteryService.isrunning
         //ClickListener
         button_ResumeChanger.setOnClickListener { SuDo(context).execCmdSync(ResumeChanger) }
         button_DisableChanger.setOnClickListener { SuDo(context).execCmdSync(DisableChanger) }

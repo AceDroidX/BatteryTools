@@ -1,5 +1,6 @@
 package com.github.acedroidx.batterytools
 
+import android.app.ActivityManager
 import android.app.Service
 import android.content.Intent
 import android.content.Context
@@ -22,12 +23,17 @@ class BatteryService : Service() {
     private var minBattery: Int = 505
     val batteryReceiver = BatteryReceiver()
 
+    override fun onDestroy() {
+        super.onDestroy()
+        isrunning = false
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d("intent:" + intent.toString())
-        if(intent==null){
+        if (intent == null) {
             Log.d("intent:null")
             register()
-        }else{
+        } else {
             when (intent.action) {
                 ACTION_REG -> {
                     register()
@@ -71,6 +77,7 @@ class BatteryService : Service() {
         val intentFilter = IntentFilter()
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED)
         applicationContext.registerReceiver(batteryReceiver, intentFilter)
+        isrunning = true
     }
 
     private fun unregister() {
@@ -80,10 +87,10 @@ class BatteryService : Service() {
             editor?.putInt("state", 0)?.apply()
             applicationContext.unregisterReceiver(batteryReceiver)
             stopSelf()
-        }catch (e:Throwable){
+        } catch (e: Throwable) {
             e.printStackTrace()
             Log.e(e.localizedMessage)
-            Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_LONG).show()
         }
 
     }
@@ -116,6 +123,8 @@ class BatteryService : Service() {
     }
 
     companion object {
+        var isrunning = false
+
         @JvmStatic
         fun startService(context: Context) {
             val intent = Intent(context, BatteryService::class.java).apply {
