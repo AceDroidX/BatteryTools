@@ -8,5 +8,5 @@ Linus的一个视频中也说明了这一点：[【官方双语】 不要再整�
 ## 功能
 自动控制充电(需要ROOT权限！)
 ## 截图
-![图1](https://github.com/AceDroidX/BatteryTools/raw/master/pic/1.png)
-![图2](https://github.com/AceDroidX/BatteryTools/raw/master/pic/2.png)
+![图1](https://github.com/AceDroidX/BatteryTools/raw/master/docs/pic/1.png)
+![图2](https://github.com/AceDroidX/BatteryTools/raw/master/docs/pic/2.png)

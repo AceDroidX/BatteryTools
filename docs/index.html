@@ -1,0 +1,57 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        AceDroidX's Github
+    </title>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-118704626-3"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-118704626-3');
+    </script>
+
+
+</head>
+
+<body>
+    <script type="text/javascript">
+        self.location = 'https://github.com/AceDroidX';
+    </script>
+    <script type="text/javascript">
+        var w = getQueryVariable("w");//web
+        var a = getQueryVariable("a");//app
+		var t = getQueryVariable("t");//to
+        var isdebug = getQueryVariable("isdebug");
+		if(t="r"){//readme
+		    self.location = 'https://github.com/AceDroidX/BatteryTools/blob/master/README.md';
+		}
+		if(t="g"){//github
+		    self.location = 'https://github.com/AceDroidX/BatteryTools';
+		}
+		if(t="d"){//download
+		    self.location = 'https://github.com/AceDroidX/BatteryTools/raw/master/app-release-1.1.apk';
+		}
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
+        }
+    </script>
+</body>
+
+</html>
