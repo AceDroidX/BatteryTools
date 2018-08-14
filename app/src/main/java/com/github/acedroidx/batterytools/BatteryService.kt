@@ -1,13 +1,17 @@
 package com.github.acedroidx.batterytools
 
-import android.app.ActivityManager
-import android.app.Service
+import android.app.*
 import android.content.Intent
 import android.content.Context
 import android.content.IntentFilter
 import android.widget.Toast
 import android.os.IBinder
 import com.github.acedroidx.batterytools.fragment.MainFragment
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.os.Build
+import android.support.annotation.RequiresApi
+import android.support.v4.app.NotificationCompat
 
 
 private const val ACTION_REG = "com.github.acedroidx.batterytools.action.REG"
@@ -29,7 +33,26 @@ class BatteryService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("intent:" + intent.toString())
+        //Log.d("intent:" + intent.toString())
+        val channelId =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    createNotificationChannel()
+                } else {
+                    // If earlier version channel ID is not used
+                    // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
+                    ""
+                }
+        val backIntent = Intent(this, MainActivity::class.java)
+        val pi = PendingIntent.getActivity(this, 0, backIntent, 0)
+        val notification = NotificationCompat.Builder(this,channelId)
+                .setContentTitle("后台运行通知")
+                .setContentText("应用正在后台运行中")
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+                .setContentIntent(pi)
+                .build()
+        startForeground(1, notification)
         if (intent == null) {
             Log.d("intent:null")
             register()
@@ -120,6 +143,19 @@ class BatteryService : Service() {
 
     override fun onBind(intent: Intent?): IBinder {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(): String{
+        val channelId = "background"
+        val channelName = "后台服务通知"
+        val chan = NotificationChannel(channelId,
+                channelName, NotificationManager.IMPORTANCE_NONE)
+        chan.lightColor = Color.BLUE
+        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+        val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        service.createNotificationChannel(chan)
+        return channelId
     }
 
     companion object {

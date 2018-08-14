@@ -1,5 +1,6 @@
 package com.github.acedroidx.batterytools.fragment
 
+import android.app.Service
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -51,7 +52,7 @@ class MainFragment : Fragment() {
         seekBar_maxAutoCharge.progress = max
         seekBar_minAutoCharge.progress = min
         text_max.text = settings.getInt("maxBattery", 80).toString()
-        text_min.text = settings.getInt("minBattery", 30).toString()
+        text_min.text = settings.getInt("minBattery", 70).toString()
         switch_autoCharge.isChecked = BatteryService.isrunning
         //ClickListener
         button_ResumeChanger.setOnClickListener { SuDo(context).execCmdSync(ResumeChanger) }
