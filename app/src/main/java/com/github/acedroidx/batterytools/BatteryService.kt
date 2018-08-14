@@ -34,25 +34,6 @@ class BatteryService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         //Log.d("intent:" + intent.toString())
-        val channelId =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    createNotificationChannel()
-                } else {
-                    // If earlier version channel ID is not used
-                    // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
-                    ""
-                }
-        val backIntent = Intent(this, MainActivity::class.java)
-        val pi = PendingIntent.getActivity(this, 0, backIntent, 0)
-        val notification = NotificationCompat.Builder(this,channelId)
-                .setContentTitle("后台运行通知")
-                .setContentText("应用正在后台运行中")
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
-                .setContentIntent(pi)
-                .build()
-        startForeground(1, notification)
         if (intent == null) {
             Log.d("intent:null")
             register()
@@ -94,6 +75,25 @@ class BatteryService : Service() {
     }
 
     private fun register() {
+        val channelId =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    createNotificationChannel()
+                } else {
+                    // If earlier version channel ID is not used
+                    // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
+                    ""
+                }
+        val backIntent = Intent(this, MainActivity::class.java)
+        val pi = PendingIntent.getActivity(this, 0, backIntent, 0)
+        val notification = NotificationCompat.Builder(this,channelId)
+                .setContentTitle("后台运行通知")
+                .setContentText("应用正在后台运行中")
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+                .setContentIntent(pi)
+                .build()
+        startForeground(1, notification)
         val settings = applicationContext.getSharedPreferences("BatterySetting", 0)
         val editor = settings?.edit()
         editor?.putInt("state", 1)?.apply()
